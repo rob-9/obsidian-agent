@@ -1,4 +1,6 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile } from 'obsidian';
+import { FileUtils } from './fileUtils';
+import { Templates } from './templates';
 
 interface AgenticChatbotSettings {
 	apiKey: string;
@@ -18,9 +20,11 @@ const DEFAULT_SETTINGS: AgenticChatbotSettings = {
 
 export default class AgenticChatbotPlugin extends Plugin {
 	settings: AgenticChatbotSettings;
+	fileUtils: FileUtils;
 
 	async onload() {
 		await this.loadSettings();
+		this.fileUtils = new FileUtils(this.app);
 
 		// Add ribbon icon for quick access to chatbot
 		this.addRibbonIcon('message-circle', 'Open Agentic Chatbot', (evt: MouseEvent) => {
@@ -44,6 +48,42 @@ export default class AgenticChatbotPlugin extends Plugin {
 				const content = editor.getValue();
 				const fileName = view.file?.name || 'Current note';
 				new ChatbotModal(this.app, this, { context: content, fileName }).open();
+			}
+		});
+
+		// Add command to create sample file
+		this.addCommand({
+			id: 'create-sample-file',
+			name: 'Create Sample File',
+			callback: async () => {
+				await this.createSampleFile();
+			}
+		});
+
+		// Add command to create daily journal
+		this.addCommand({
+			id: 'create-daily-journal',
+			name: 'Create Daily Journal',
+			callback: async () => {
+				await this.createDailyJournal();
+			}
+		});
+
+		// Add command to create meeting notes
+		this.addCommand({
+			id: 'create-meeting-notes',
+			name: 'Create Meeting Notes',
+			callback: async () => {
+				await this.createMeetingNotes();
+			}
+		});
+
+		// Add command to create research notes
+		this.addCommand({
+			id: 'create-research-notes',
+			name: 'Create Research Notes',
+			callback: async () => {
+				await this.createResearchNotes();
 			}
 		});
 
@@ -108,6 +148,59 @@ export default class AgenticChatbotPlugin extends Plugin {
 	async expandIdeas(content: string): Promise<string> {
 		const prompt = `Expand on the ideas in this content with additional insights and connections:\n\n${content}`;
 		return await this.sendMessage(prompt);
+	}
+
+	async createSampleFile(): Promise<void> {
+		const currentDate = new Date().toISOString().split('T')[0];
+		const fileName = `Sample Note ${currentDate}`;
+		const content = Templates.getSampleNoteContent();
+
+		try {
+			await this.fileUtils.createFolder('Agent Created');
+			await this.fileUtils.createAndWriteFile(fileName, content, 'Agent Created');
+		} catch (error) {
+			// If folder doesn't exist, create in root
+			await this.fileUtils.createAndWriteFile(fileName, content);
+		}
+	}
+
+	async createDailyJournal(): Promise<void> {
+		const currentDate = new Date().toISOString().split('T')[0];
+		const fileName = `Daily Journal ${currentDate}`;
+		const content = Templates.getDailyJournalTemplate();
+
+		try {
+			await this.fileUtils.createFolder('Daily Journals');
+			await this.fileUtils.createAndWriteFile(fileName, content, 'Daily Journals');
+		} catch (error) {
+			await this.fileUtils.createAndWriteFile(fileName, content);
+		}
+	}
+
+	async createMeetingNotes(): Promise<void> {
+		const currentDate = new Date().toISOString().split('T')[0];
+		const fileName = `Meeting Notes ${currentDate}`;
+		const content = Templates.getMeetingNotesTemplate();
+
+		try {
+			await this.fileUtils.createFolder('Meeting Notes');
+			await this.fileUtils.createAndWriteFile(fileName, content, 'Meeting Notes');
+		} catch (error) {
+			await this.fileUtils.createAndWriteFile(fileName, content);
+		}
+	}
+
+	async createResearchNotes(): Promise<void> {
+		const currentDate = new Date().toISOString().split('T')[0];
+		const fileName = `Research Notes ${currentDate}`;
+		const content = Templates.getResearchNotesTemplate();
+
+		try {
+			await this.fileUtils.createFolder('Research');
+			await this.fileUtils.createAndWriteFile(fileName, content, 'Research');
+		} catch (error) {
+			await this.fileUtils.createAndWriteFile(fileName, content);
+		}
 	}
 }
 

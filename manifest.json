@@ -1,10 +1,10 @@
 {
-	"id": "agentic-chatbot",
-	"name": "Agentic Chatbot",
+	"id": "obsidian-chatbot",
+	"name": "Obsidian Chatbot",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "An intelligent agentic chatbot that can help with various tasks within Obsidian",
-	"author": "Your Name",
+	"author": "rob",
 	"authorUrl": "",
 	"isDesktopOnly": false
 }
