@@ -14,6 +14,6 @@
 ### installation
 1. clone in `.obsidian/plugins/agent/`
 2. `npm install`
-3. `npm run dev`
+3. `npm run dev` or `npm run build`
 4. enable plugin in Obsidian settings
 5. configure API settings
